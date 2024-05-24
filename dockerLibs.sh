@@ -16,6 +16,22 @@
 # e.g.: $DOCKER_HUB/$DOCKER_ORG/repository:latest
 #
 
+# List all service of a dockerfile passed as parameter
+fnListServices() {
+    local compose_file=$1
+    if [ -z "$compose_file" ]; then
+        echo "Error: Please provide the path to the Docker Compose file as an argument."
+        return 1
+    fi
+
+    if ! command -v yq &> /dev/null; then
+        echo "Error: 'yq' command not found. Please install 'yq' to use this function."
+        return 1
+    fi
+
+    docker-compose -f "$compose_file" config | yq '.services | keys[]'
+}
+
 # Normalizes according to docker hub organization/image naming conventions:
 fnNormalize() {
   echo "$1" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9._-]//g'
