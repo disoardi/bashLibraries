@@ -20,12 +20,12 @@
 fnListServices() {
     local compose_file=$1
     if [ -z "$compose_file" ]; then
-        echo "Error: Please provide the path to the Docker Compose file as an argument."
+        eerror "Error: Please provide the path to the Docker Compose file as an argument."
         return 1
     fi
 
     if ! command -v yq &> /dev/null; then
-        echo "Error: 'yq' command not found. Please install 'yq' to use this function."
+        eerror "Error: 'yq' command not found. Please install 'yq' to use this function."
         return 1
     fi
 
