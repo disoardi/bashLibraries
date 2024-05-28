@@ -102,10 +102,8 @@ fnGitGetRelease() {
 fnCheckCMD() {
     local cmd=$1
     if command -v "$cmd" &> /dev/null; then
-        einfo "Command '$cmd' is installed."
         return 0
     else
-        ecrit "Command '$cmd' is not installed."
         return 1
     fi
 }

@@ -29,7 +29,7 @@ fnListServices() {
         return 1
     fi
 
-    docker-compose -f "$compose_file" config | yq '.services | keys[]'
+    docker compose -f $compose_file config | yq '.services[]|key'
 }
 
 # Normalizes according to docker hub organization/image naming conventions:

@@ -10,3 +10,6 @@
 ├── logging.sh              # Libreria di logging utilizzata anche dalle altre librerie
 └── README.md               # Questo file
 ```
+# Dependencies
+
+- yq --> you can see all instruction on [source repo](https://github.com/mikefarah/yq)
