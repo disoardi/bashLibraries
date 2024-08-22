@@ -11,8 +11,8 @@
 
 fnGetProperties() {
   # example of usage
-  # fnGetProperties <properties> <file.properties>
-  if [ ! $# -eq 2 ]; then
+  # fnGetProperties <properties> <file.properties> <var to assigne prop. value>
+  if [ ! $# -eq 3 ]; then
       eerror "$FUNCNAME --> Errore: numero di parametri non corretto"
       exit 1
   fi
@@ -20,15 +20,17 @@ fnGetProperties() {
       eerror "$FUNCNAME --> Errore: file.properties non trovato - ${${2}}"
       exit 1
   fi
-  return $(grep "^${1}" "${2}"|cut -d'=' -f2)
+
+  declare -n ret=$3
+  ret=$(grep "^${1}" "${2}"|cut -d'=' -f2)
 }
 
 fnExistsInList() {
   # example of usage
   # fnExistsInList <list> <delimiter> <value>
-  LIST=$1
-  DELIMITER=$2
-  VALUE=$3
+  local LIST=$1
+  local DELIMITER=$2
+  local VALUE=$3
   [[ "$LIST" =~ ($DELIMITER|^)$VALUE($DELIMITER|$) ]]
 }
 
@@ -37,14 +39,14 @@ fnWaitAnswer(){
   # fnWaitAnswer <question>
   if [ ! $# -eq 1 ]; then
     ecrit "Errore: numero di parametri non corretto"
-    ecrit "FUNCNAME si aspetta una domanda da porre!"
+    ecrit "$FUNCNAME si aspetta una domanda da porre!"
     exit 1
   fi
   
   read -p "${1} [y]/n " VAR
   if [[ ${VAR,,} == "n" ]]; then
     einfo "Interrrotto dall'utente."
-    exit 1
+    return 1
   elif [[ ${VAR,,} == "y" ]]; then
     einfo "Continuo..."
     fnSleepProgress 3
