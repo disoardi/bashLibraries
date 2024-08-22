@@ -120,11 +120,12 @@ fnWaitYToContinue (){
 }
 
 fnPrintIfSet () {
-    if [ -n "$1" ]; then
-        einfo "$1"
+  local varName="$1"
+    if [[ -n "${!varName}" ]]; then
+        einfo "${!varName}"
     else
-        ecrit "$0: Var is not set"
-        exit 1
+        ewarn "Variable '$varName' is not set or does not exist."
+        return 1
     fi
 }
 
@@ -178,12 +179,12 @@ cleanup () {
 trap cleanup INT QUIT TERM
 
 spinner () {
-    # Safest option are one of these. Doesn't need Unicode, at all.
-    local ASCII_PROPELLER="/ - \\ |"
-    local ASCII_PLUS="x +"
-    local ASCII_BLINK="o -"
-    local ASCII_V="v < ^ >"
-    local ASCII_INFLATE=". o O o"
+  # Safest option are one of these. Doesn't need Unicode, at all.
+  local ASCII_PROPELLER="/ - \\ |"
+  local ASCII_PLUS="x +"
+  local ASCII_BLINK="o -"
+  local ASCII_V="v < ^ >"
+  local ASCII_INFLATE=". o O o"
 
   # Needs Unicode support in shell and terminal.
   # These are ordered most to least likely to be available, in my limited experience.
@@ -215,14 +216,14 @@ spinner () {
   # Bigger spinners and progress type bars; takes more space.
   local WIDE_ASCII_PROG="[>----] [=>---] [==>--] [===>-] [====>] [----<] [---<=] [--<==] [-<===] [<====]"
   local WIDE_ASCII_PROPELLER="[|####] [#/###] [##-##] [###\\#] [####|] [###\\#] [##-##] [#/###]"
-      local WIDE_ASCII_SNEK="[>----] [~>---] [~~>--] [~~~>-] [~~~~>] [----<] [---<~] [--<~~] [-<~~~] [<~~~~]"
-        local WIDE_UNI_GREYSCALE="░░░░░░░ ▒░░░░░░ ▒▒░░░░░ ▒▒▒░░░░ ▒▒▒▒░░░ ▒▒▒▒▒░░ ▒▒▒▒▒▒░ ▒▒▒▒▒▒▒ ▒▒▒▒▒▒░ ▒▒▒▒▒░░ ▒▒▒▒░░░ ▒▒▒░░░░ ▒▒░░░░░ ▒░░░░░░ ░░░░░░░"
-        local WIDE_UNI_GREYSCALE2="░░░░░░░ ▒░░░░░░ ▒▒░░░░░ ▒▒▒░░░░ ▒▒▒▒░░░ ▒▒▒▒▒░░ ▒▒▒▒▒▒░ ▒▒▒▒▒▒▒ ░▒▒▒▒▒▒ ░░▒▒▒▒▒ ░░░▒▒▒▒ ░░░░▒▒▒ ░░░░░▒▒ ░░░░░░▒"
+  local WIDE_ASCII_SNEK="[>----] [~>---] [~~>--] [~~~>-] [~~~~>] [----<] [---<~] [--<~~] [-<~~~] [<~~~~]"
+  local WIDE_UNI_GREYSCALE="░░░░░░░ ▒░░░░░░ ▒▒░░░░░ ▒▒▒░░░░ ▒▒▒▒░░░ ▒▒▒▒▒░░ ▒▒▒▒▒▒░ ▒▒▒▒▒▒▒ ▒▒▒▒▒▒░ ▒▒▒▒▒░░ ▒▒▒▒░░░ ▒▒▒░░░░ ▒▒░░░░░ ▒░░░░░░ ░░░░░░░"
+  local WIDE_UNI_GREYSCALE2="░░░░░░░ ▒░░░░░░ ▒▒░░░░░ ▒▒▒░░░░ ▒▒▒▒░░░ ▒▒▒▒▒░░ ▒▒▒▒▒▒░ ▒▒▒▒▒▒▒ ░▒▒▒▒▒▒ ░░▒▒▒▒▒ ░░░▒▒▒▒ ░░░░▒▒▒ ░░░░░▒▒ ░░░░░░▒"
 
-        local SPINNER_NORMAL
-        SPINNER_NORMAL=$(tput sgr0)
+  local SPINNER_NORMAL
+  SPINNER_NORMAL=$(tput sgr0)
 
-        eval SYMBOLS=\$${SPINNER_SYMBOLS}
+  eval SYMBOLS=\$${SPINNER_SYMBOLS}
 
   # Get the parent PID
   SPINNER_PPID=$(ps -p "$$" -o ppid=)
@@ -257,7 +258,8 @@ spinner () {
               # this ps with a "garbage option" error.
               # XXX Potential gotcha if ps produces weird output.
               # shellcheck disable=SC2086
-              SPINNER_PARENTUP=$(ps --no-headers $SPINNER_PPID)
+              #SPINNER_PARENTUP=$(ps --no-headers $SPINNER_PPID) --no-headers is unsupported on BSD like system
+              SPINNER_PARENTUP=$(ps $SPINNER_PPID | tail -n +2)
               if [ -z "$SPINNER_PARENTUP" ]; then
                   break 2
               fi
