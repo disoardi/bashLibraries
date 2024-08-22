@@ -58,47 +58,48 @@ fnWaitAnswer(){
 }
 
 fnGitGetRelease() {
-    # example of usage
-    # ./get_gh_asset.sh :owner :repo :tag :name
-    # Need file with git credential named .secrets
+  # TODO: create test
+  # example of usage
+  # fnGitGetRelease :owner :repo :tag :name
+  # Need file with git credential named .secrets
 
-    CWD="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
+  CWD="$(cd -P -- "$(dirname -- "$0")" && pwd -P)"
 
-    # Check dependencies.
-    set -e
-    type curl grep sed tr >&2
-    xargs=$(which gxargs || which xargs)
+  # Check dependencies.
+  set -e
+  type curl grep sed tr >&2
+  xargs=$(which gxargs || which xargs)
 
-    # Validate settings.
-    [ -f ~/.secrets ] && source ~/.secrets
-    [ "$GITHUB_API_TOKEN" ] || { ecrit "${FUNCNAME} - Error: Please define GITHUB_API_TOKEN variable." >&2; exit 1; }
-    [ $# -ne 4 ] && { echo "Usage: $0 [owner] [repo] [tag] [name]"; exit 1; }
-    [ "$TRACE" ] && set -x
-    read owner repo tag name <<<$@
+  # Validate settings.
+  [ -f ~/.secrets ] && source ~/.secrets
+  [ "$GITHUB_API_TOKEN" ] || { ecrit "${FUNCNAME} - Error: Please define GITHUB_API_TOKEN variable." >&2; exit 1; }
+  [ $# -ne 4 ] && { echo "Usage: $0 [owner] [repo] [tag] [name]"; exit 1; }
+  [ "$TRACE" ] && set -x
+  read owner repo tag name <<<$@
 
-    # Define variables.
-    GH_API="https://api.github.com"
-    GH_REPO="$GH_API/repos/$owner/$repo"
-    GH_TAGS="$GH_REPO/releases/tags/$tag"
-    AUTH="Authorization: token $GITHUB_API_TOKEN"
-    WGET_ARGS="--content-disposition --auth-no-challenge --no-cookie"
-    CURL_ARGS="-LJO#"
+  # Define variables.
+  GH_API="https://api.github.com"
+  GH_REPO="$GH_API/repos/$owner/$repo"
+  GH_TAGS="$GH_REPO/releases/tags/$tag"
+  AUTH="Authorization: token $GITHUB_API_TOKEN"
+  WGET_ARGS="--content-disposition --auth-no-challenge --no-cookie"
+  CURL_ARGS="-LJO#"
 
-    # Validate token.
-    curl -o /dev/null -sH "$AUTH" $GH_REPO || { ecrit "${FUNCNAME} - Error: Invalid repo, token or network issue!";  exit 1; }
+  # Validate token.
+  curl -o /dev/null -sH "$AUTH" $GH_REPO || { ecrit "${FUNCNAME} - Error: Invalid repo, token or network issue!";  exit 1; }
 
-    # Read asset tags.
-    response=$(curl -sH "$AUTH" $GH_TAGS)
-    # Get ID of the asset based on given name.
-    eval $(echo "$response" | grep -C3 "name.:.\+$name" | grep -w id | tr : = | tr -cd '[[:alnum:]]=')
-    #id=$(echo "$response" | jq --arg name "$name" '.assets[] | select(.name == $name).id') # If jq is installed, this can be used instead. 
-    [ "$id" ] || { ecrit "${FUNCNAME} - Error: Failed to get asset id, response: $response" | awk 'length($0)<100' >&2; exit 1; }
-    GH_ASSET="$GH_REPO/releases/assets/$id"
+  # Read asset tags.
+  response=$(curl -sH "$AUTH" $GH_TAGS)
+  # Get ID of the asset based on given name.
+  eval $(echo "$response" | grep -C3 "name.:.\+$name" | grep -w id | tr : = | tr -cd '[[:alnum:]]=')
+  #id=$(echo "$response" | jq --arg name "$name" '.assets[] | select(.name == $name).id') # If jq is installed, this can be used instead. 
+  [ "$id" ] || { ecrit "${FUNCNAME} - Error: Failed to get asset id, response: $response" | awk 'length($0)<100' >&2; exit 1; }
+  GH_ASSET="$GH_REPO/releases/assets/$id"
 
-    # Download asset file.
-    echo "Downloading asset..." >&2
-    curl $CURL_ARGS -H "Authorization: token $GITHUB_API_TOKEN" -H 'Accept: application/octet-stream' "$GH_ASSET"
-    echo "$0 done." >&2
+  # Download asset file.
+  echo "Downloading asset..." >&2
+  curl $CURL_ARGS -H "Authorization: token $GITHUB_API_TOKEN" -H 'Accept: application/octet-stream' "$GH_ASSET"
+  echo "$0 done." >&2
 }
 
 fnCheckCMD() {

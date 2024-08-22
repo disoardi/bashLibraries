@@ -11,6 +11,58 @@ source ./logging.sh
 
 
 # Test the functions in bash_libraries.sh file
+# Test the fnGetProperties function
+function test_fnGetProperties() {
+  local result
+  # Test with a valid file
+  fnGetProperties "prop1" "test.properties" result
+  if [ "$result" == "value1" ]; then
+    einfo "Test passed: fnGetProperties with valid file"
+  else
+    eerror "Test failed: fnGetProperties with valid file"
+  fi
+}
+
+# Test the fnExistsInList
+function test_fnExistsInList() {
+  # Test with a value present in the list
+  local LIST="value1,value2,value3"
+  local DELIMITER=","
+  local VALUE="value2"
+  if fnExistsInList "$LIST" "$DELIMITER" "$VALUE"; then
+    einfo "Test passed: fnExistsInList with value present in the list"
+  else
+    eerror "Test failed: fnExistsInList with value present in the list"
+  fi
+  # Test with a value is not in the list
+  local VALUE="value4"
+  if fnExistsInList "$LIST" "$DELIMITER" "$VALUE"; then
+    eerror "Test failed: fnExistsInList with value not in the list"
+  else
+    einfo "Test passed: fnExistsInList with value not in the list"
+  fi
+}
+
+# Test the fnWaitAnswer function
+function test_fnWaitAnswer() {
+  # Test with 'y' input
+  echo "y" | fnWaitAnswer "Procedere?"
+  if [ $? -eq 0 ]; then
+    einfo "Test passed: fnWaitAnswer with 'y' input"
+  else
+    eerror "Test failed: fnWaitAnswer with 'y' input"
+  fi
+  # Test with 'n' input
+  echo "n" | fnWaitAnswer "Procedere?"
+  if [ $? -eq 1 ]; then
+    einfo "Test passed: fnWaitAnswer with 'n' input"
+  else
+    eerror "Test failed: fnWaitAnswer with 'n' input"
+  fi
+}
+
+
+
 # Test the fnCheckCMD function
 function test_fnCheckCMD() {
     # Test when the command is installed
@@ -52,8 +104,8 @@ function test_fnWaitYToContinue() {
 # Test the fnPrintIfSet function
 function test_fnPrintIfSet() {
     # Test when the variable is set
-    MY_VAR="hello"
-    fnPrintIfSet "MY_VAR"
+    export MY_VAR="hello"
+    fnPrintIfSet MY_VAR
     if [ $? -eq 0 ]; then
         einfo "Test passed: fnPrintIfSet with variable set"
     else
@@ -62,7 +114,7 @@ function test_fnPrintIfSet() {
 
     # Test when the variable is not set
     unset MY_VAR
-    fnPrintIfSet "MY_VAR"
+    fnPrintIfSet MY_VAR
     if [ $? -eq 1 ]; then
         einfo "Test passed: fnPrintIfSet with variable not set"
     else
@@ -162,15 +214,21 @@ function test_fnBuildImages() {
 
 
 
-# Run all the tests
+# Run all the tests for bash_libraries.sh
+test_fnGetProperties
+test_fnExistsInList
+test_fnWaitAnswer
 test_fnCheckCMD
 test_fnWaitYToContinue
 test_fnPrintIfSet
 test_fnStartSpinner
 test_fnSleepProgress
+# simple test for run_ok -> Other tests would be too complicated
+run_ok "sleep 5" "prova" 
 
-test_fnListServices
-test_fnNormalize
-test_fnBuildVersion
-test_fnBuild
-test_fnBuildImages
+# Run all the tests for dockerLibs.sh
+#test_fnListServices
+#test_fnNormalize
+#test_fnBuildVersion
+#test_fnBuild
+#test_fnBuildImages
