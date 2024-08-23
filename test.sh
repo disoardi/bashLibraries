@@ -1,5 +1,18 @@
 #!/usr/bin/env bash
+#
+# SCRIPT: Testint bash libraries
+# AUTHOR: Davide Isoardi
+# DATE: 23/08/2024
+# REV: 1.0.0
+#
+# PURPOSE: Test all functions
+#
+# TO_DO list
+#
 
+##########################################
+# CLONE BASH LIBRARIES HERE	             #
+##########################################
 # Source the bash_libraries.sh file using relative path
 source ./bash_libraries.sh
 
@@ -9,6 +22,9 @@ source ./dockerLibs.sh
 # Source the logging.sh file using relative path
 source ./logging.sh
 
+##########################################
+# DEFINE ENV, FILES AND VARIABLES HERE   #
+#i########################################
 
 # Test the functions in bash_libraries.sh file
 # Test the fnGetProperties function
@@ -212,7 +228,9 @@ function test_fnBuildImages() {
     fi
 }
 
-
+##########################################
+# BEGINNING OF MAIN                      #
+##########################################
 
 # Run all the tests for bash_libraries.sh
 test_fnGetProperties
@@ -232,3 +250,8 @@ run_ok "sleep 5" "prova"
 #test_fnBuildVersion
 #test_fnBuild
 #test_fnBuildImages
+
+
+##########################################
+# UNSET ENV VARS                         #
+##########################################
