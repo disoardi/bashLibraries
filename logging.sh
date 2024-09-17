@@ -18,7 +18,8 @@ colpur='\033[0;35m' # Purple
 colwht='\033[0;97m' # White
 colrst='\033[0m'    # Text Reset
 
-verbosity=6
+if [ -z ${verbosity+x} ]; then verbosity=6; fi
+
 
 ### verbosity levels
 silent_lvl=0
